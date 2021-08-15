@@ -10,8 +10,6 @@ namespace WorkSchedule.Controllers
 {
     public class ScheduleController : Controller
     {
-        private Context dbContext = new Context();
-
         public ActionResult Index()
         {
             ViewBag.Days = FirstDateOfWeek(2021, 33);

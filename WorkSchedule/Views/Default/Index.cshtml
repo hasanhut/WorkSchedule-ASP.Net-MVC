@@ -1,0 +1,44 @@
+﻿@model WorkSchedule.Models.ViewModel
+
+@{
+    ViewData["Title"] = "Default Page";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 5px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    
+@foreach (var item in Model.Employees)
+{
+    @item.EmployeeName
+}
+<table>
+    <tr>
+        <th>Name</th>
+        @foreach (var days in ViewBag.Days)
+        {
+            <th>
+                @days
+            </th>
+        }
+    </tr>
+        
+    <tr>
+        <td>TEST</td>
+        <td>SW</td>
+    </tr>
+</table>
+</body>
+</html>
