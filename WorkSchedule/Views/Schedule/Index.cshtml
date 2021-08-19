@@ -1,41 +1,23 @@
 ﻿@using WorkSchedule.Controllers
-@model IEnumerable<WorkSchedule.Models.Employee>
+@model WorkSchedule.Models.ViewModel
+
 @{
     ViewData["Title"] = "Home Page";
 }
 <!DOCTYPE html>
+<script src="~/lib/jquery/dist/jquery.js"></script>
 <html>
 <head>
-    <style>
-        table, th, td {
-            border: 1px solid black;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 5px;
-            text-align: left;
-        }
-    </style>
+    
 </head>
 <body>
+<p id="rData"></p>
+<script>
+    var url = "/Schedule/TellMeDate";
+    $.get(url, null, function (data) {
+        $("#rData").html(data);
+    });
+</script>
 
-
-    <table>
-        <tr>
-            <th>Name</th>
-            @foreach (var days in ViewBag.Days)
-            {
-                <th>
-                    @days
-                </th>
-            }
-        </tr>
-        
-        <tr>
-            <td>TEST</td>
-            <td>SW</td>
-        </tr>
-    </table>
 </body>
 </html>

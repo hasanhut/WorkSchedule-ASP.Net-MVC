@@ -17,9 +17,13 @@ namespace WorkSchedule.Controllers
         }
         public IActionResult Index()
         {
-            return View("~/Views/Shared/Index.cshtml");
+            return View();
         }
-
-
+        [HttpGet]
+        public IActionResult GetEmployees()
+        {
+            var result = _context.Employees.ToList();
+            return Ok(result);
+        }
     }
 }

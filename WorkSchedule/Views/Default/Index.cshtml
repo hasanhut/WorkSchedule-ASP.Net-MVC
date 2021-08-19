@@ -1,4 +1,6 @@
-﻿@model WorkSchedule.Models.ViewModel
+﻿@using WorkSchedule.Controllers
+@using Newtonsoft.Json
+@model WorkSchedule.Models.ViewModel
 
 @{
     ViewData["Title"] = "Default Page";
@@ -19,26 +21,126 @@
     </style>
 </head>
 <body>
-    
-@foreach (var item in Model.Employees)
-{
-    @item.EmployeeName
-}
-<table>
-    <tr>
-        <th>Name</th>
-        @foreach (var days in ViewBag.Days)
-        {
-            <th>
-                @days
-            </th>
+    <div>
+        Enter Name @Html.TextBox("Name")
+        Enter Year @Html.TextBox("Year")
+        Enter Week Of Year @Html.TextBox("WeekOfYear")
+        <input type="submit" id="Submit" value="Submit" />
+    </div>   
+    <table id="showData">
+
+    </table>
+    <div id="errorData">
+
+    </div>
+
+
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script type="text/jscript">
+    $('#Submit').click(function () {
+        var urlDate = "/Schedule/FirstDateOfWeek";
+        var urlEmployee = "/Employee/GetEmployees";
+        var items = '<thead><tr><th>Name</th>';
+        var name = $('#Name').val();
+        var week = $('#WeekOfYear').val();
+        var year = $('#Year').val();
+        var lengthOfWeek;
+        var tr = '<tbody>';
+        if (name.length > 0 && week > 0 && year > 0){
+            $.get(urlDate, { year: year, weekOfYear: week }, function (data) {
+                $.each(data, function (index, value) {
+                    
+                    items += "<th>" + value + "</th>"
+                });
+                items += "</tr></thead>";
+                $('#showData').html(items);
+                lengthOfWeek = data.length;
+            });
+            $.get(urlEmployee, null, function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].employeeName == name) {
+                        tr += "<tr><td>" + data[i].employeeName + "</td>";
+                    }
+                    
+                }
+                for (var i = 0; i < lengthOfWeek; i++) {
+                    tr += "<td class='dropdown'><form action='' name='SwType'><select name = 'filter_for' ><option value='ST'>ST</option><option value='NW'>NW</option><option value='AL'>AL</option><option value='HR'>HR</option><option value='UL'>UL</option><option value='SW'>SW</option><option value='ML'>ML</option><option value='W'>W</option><option value='PH'>PH</option></select ></form ></td >"
+                }
+                $('#showData').append(tr);
+            });
         }
-    </tr>
-        
-    <tr>
-        <td>TEST</td>
-        <td>SW</td>
-    </tr>
-</table>
+        else {
+            $('#errorData').html("You must fill in the blanks");
+            setTimeout(function () {
+                $('#errorData').html("");
+            }, 1000);
+        }
+    });
+    
+    
+            
+    </script>
+
+@*<table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    @foreach (var weekDay in ViewBag.WeekDays)
+                    {
+                        <th>
+                            @weekDay
+                        </th>
+                    }
+                    @foreach (var weekendDay in ViewBag.WeekendDays)
+                    {
+                        <th>
+                            @weekendDay
+                        </th>
+                    }
+                </tr>
+
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Employees)
+                {
+                    <tr>
+                        <td>@item.EmployeeName</td>
+
+                        @foreach (var weekDay in ViewBag.WeekDays)
+                        {
+                            <td class="dropdown">
+                                <form action="" name="SwType">
+                                    <select name="filter_for">
+                                        <option value="ST">ST</option>
+                                        <option value="NW">NW</option>
+                                        <option value="AL">AL</option>
+                                        <option value="HR">HR</option>
+                                        <option value="UL">UL</option>
+                                        <option value="SW">SW</option>
+                                        <option value="ML">ML</option>
+                                        <option value="W">W</option>
+                                        <option value="PH">PH</option>
+                                    </select>
+                                </form>
+                            </td>
+                        }
+                        @foreach (var weekendDay in ViewBag.WeekendDays)
+                        {
+                            <td class="dropdown">
+                                <form action="" name="SwType">
+                                    <select name="filter_for">
+                                        <option value="W">W</option>
+                                    </select>
+                                </form>
+                            </td>
+                        }
+                    </tr>
+
+                }
+            </tbody>
+        </table>*@
+
+
 </body>
 </html>
