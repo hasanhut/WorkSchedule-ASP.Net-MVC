@@ -18,26 +18,45 @@
             padding: 5px;
             text-align: left;
         }
+        .submitDateButton {
+            visibility: hidden;
+        }
     </style>
 </head>
 <body>
     <div>
-        Enter Name @Html.TextBox("Name")
-        Enter Year @Html.TextBox("Year")
-        Enter Week Of Year @Html.TextBox("WeekOfYear")
-        <input type="submit" id="Submit" value="Submit" />
+        <label for="Name">Enter Your Name :</label>
+        <input type="text" id="Name" /><br>
+        <label for="Year">Enter Year :</label>
+        <input type="number" id="Year" value="2021"/><br>
+        <label for="WeekOfYear">Enter Week Of Year : (Between 1 to 53)</label>
+        <input type="number" id="WeekOfYear" min="1" max="53"/><br>
+        <input type="submit" id="Submit" value="Submit" /><br>
     </div>   
     <table id="showData">
 
     </table>
     <div id="errorData">
-
+        <br>
     </div>
+<div class="submitDateButton">
+    <br>
+    <input type="submit" id="SubmitDate" value="SubmitDate" />
+</div>
 
 
 
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <script type="text/jscript">
+    var submitDateButton = document.querySelector('.submitDateButton');
+    $('#SubmitDate').click(function () {
+        var arr = [];
+        for (var i = 0; i < 7; i++) {
+            /*document.getElementById("message").innerHTML = document.getElementById("dropdownid" + [i]).value;*/
+            arr.push(document.getElementById("dropdownid" + [i]).value);
+        };
+        console.log(arr);
+    });
     $('#Submit').click(function () {
         var urlDate = "/Schedule/FirstDateOfWeek";
         var urlEmployee = "/Employee/GetEmployees";
@@ -47,7 +66,8 @@
         var year = $('#Year').val();
         var lengthOfWeek;
         var tr = '<tbody>';
-        if (name.length > 0 && week > 0 && year > 0){
+        if (name.length > 0 && week > 0 && year > 0 && week < 54) {
+            submitDateButton.style.visibility = 'visible';
             $.get(urlDate, { year: year, weekOfYear: week }, function (data) {
                 $.each(data, function (index, value) {
                     
@@ -65,7 +85,7 @@
                     
                 }
                 for (var i = 0; i < lengthOfWeek; i++) {
-                    tr += "<td class='dropdown'><form action='' name='SwType'><select name = 'filter_for' ><option value='ST'>ST</option><option value='NW'>NW</option><option value='AL'>AL</option><option value='HR'>HR</option><option value='UL'>UL</option><option value='SW'>SW</option><option value='ML'>ML</option><option value='W'>W</option><option value='PH'>PH</option></select ></form ></td >"
+                    tr += "<td class='dropdown'><select id='dropdownid" + [i] +"' name = 'filter_for'><option value='ST'>ST</option><option value='NW'>NW</option><option value='AL'>AL</option><option value='HR'>HR</option><option value='UL'>UL</option><option value='SW'>SW</option><option value='ML'>ML</option><option value='W'>W</option><option value='PH'>PH</option></select ></td >"
                 }
                 $('#showData').append(tr);
             });
@@ -76,11 +96,10 @@
                 $('#errorData').html("");
             }, 1000);
         }
+        
     });
-    
-    
-            
-    </script>
+
+</script>
 
 @*<table>
             <thead>
