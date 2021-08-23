@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Itenso.TimePeriod;
+using System.Configuration;
+using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using WorkSchedule.Models;
 
 namespace WorkSchedule.Controllers
@@ -11,7 +14,6 @@ namespace WorkSchedule.Controllers
     public class ScheduleController : Controller
     {
         private readonly Context _context;
-
         public ScheduleController(Context context)
         {
             _context = context;
@@ -20,14 +22,7 @@ namespace WorkSchedule.Controllers
         {
             return View();
         }
-        public string WelcomeMsg(string input)
-        {
-            if (!String.IsNullOrEmpty(input))
-                return "Please welcome " + input + ".";
-            else
-                return "Please enter your name.";
-        }
-        public IActionResult FirstDateOfWeek(int year, int weekOfYear)
+        public ActionResult FirstDateOfWeek(int year, int weekOfYear)
         {
             if (year == 0 & weekOfYear == 0)
             {
@@ -62,5 +57,19 @@ namespace WorkSchedule.Controllers
             }
             return Ok(allWeekDays);
         }
+
+
+        [HttpPost]
+        public ActionResult InsertSchedule(Schedule schedule)
+        {
+            using (_context)
+            {
+                _context.Schedules.Add(schedule);
+                _context.SaveChanges();
+            }
+
+            return Json(schedule);
+        }
+
     }
 }

@@ -6,72 +6,66 @@
     ViewData["Title"] = "Default Page";
 }
 <!DOCTYPE html>
-<html>
-<head>
-    <style>
-        table, th, td {
-            border: 1px solid black;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 5px;
-            text-align: left;
-        }
-        .submitDateButton {
-            visibility: hidden;
-        }
-    </style>
-</head>
-<body>
-    <div>
-        <label for="Name">Enter Your Name :</label>
-        <input type="text" id="Name" /><br>
-        <label for="Year">Enter Year :</label>
-        <input type="number" id="Year" value="2021"/><br>
-        <label for="WeekOfYear">Enter Week Of Year : (Between 1 to 53)</label>
-        <input type="number" id="WeekOfYear" min="1" max="53"/><br>
-        <input type="submit" id="Submit" value="Submit" /><br>
-    </div>   
-    <table id="showData">
-
-    </table>
-    <div id="errorData">
-        <br>
-    </div>
-<div class="submitDateButton">
-    <br>
-    <input type="submit" id="SubmitDate" value="SubmitDate" />
-</div>
-
-
-
+<link href="~/css/site.css" rel="stylesheet" />
+<link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
 <script src="~/lib/jquery/dist/jquery.js"></script>
+<html>
+<body>
+    <div class="container">
+        <div class="form-row">
+            <div class="col">
+                <label for="Name">Enter Your Name</label>
+                <input type="text" id="Name" class="form-control form-control-sm" placeholder="Name" />
+            </div>
+            <div class="col">
+                <label for="Year">Enter Year</label>
+                <input type="number" id="Year" value="2021" class="form-control form-control-sm" placeholder="Year" />
+            </div>
+            <div class="col">
+                <label for="WeekOfYear">Enter Week Of Year</label>
+                <input type="number" id="WeekOfYear" min="1" max="53" class="form-control form-control-sm" placeholder="Week" />
+                <small id="weekHelp" class="form-text text-muted">Week must be entered between the numbers 1 and 53.</small>
+            </div>
+        </div>
+        <br />
+        <div id="submitButton">
+            <button type="submit" id="Submit" class="btn btn-secondary">Submit</button>
+        </div>
+        <br />
+        <div class="alert alert-danger" role="alert" id="errorText">
+            <br>
+        </div>
+        <table id="showData" class="table">
+        </table>
+        <div id="insertDateButton">
+            <br>
+            <button type="submit" id="InsertDate" class="btn btn-secondary">Insert Date</button>
+        </div>
+        
+
+    </div>
+
 <script type="text/jscript">
-    var submitDateButton = document.querySelector('.submitDateButton');
-    $('#SubmitDate').click(function () {
-        var arr = [];
-        for (var i = 0; i < 7; i++) {
-            /*document.getElementById("message").innerHTML = document.getElementById("dropdownid" + [i]).value;*/
-            arr.push(document.getElementById("dropdownid" + [i]).value);
-        };
-        console.log(arr);
-    });
+    var insertDateButton = document.querySelector('#insertDateButton');
+    var errorText = document.querySelector('#errorText');
+    var name, week, year;
+    var swType = [];
+    var date = [];
     $('#Submit').click(function () {
         var urlDate = "/Schedule/FirstDateOfWeek";
         var urlEmployee = "/Employee/GetEmployees";
-        var items = '<thead><tr><th>Name</th>';
-        var name = $('#Name').val();
-        var week = $('#WeekOfYear').val();
-        var year = $('#Year').val();
+        var items = '<thead class="thead-dark"><tr><th scope="col">Name</th>';
+        name = $('#Name').val();
+        week = $('#WeekOfYear').val();
+        year = $('#Year').val();
         var lengthOfWeek;
         var tr = '<tbody>';
         if (name.length > 0 && week > 0 && year > 0 && week < 54) {
-            submitDateButton.style.visibility = 'visible';
+            insertDateButton.style.visibility = 'visible';
             $.get(urlDate, { year: year, weekOfYear: week }, function (data) {
                 $.each(data, function (index, value) {
-                    
-                    items += "<th>" + value + "</th>"
+                    items += "<th scope='col'>" + value + "</th>"
+                    date.push(value);
                 });
                 items += "</tr></thead>";
                 $('#showData').html(items);
@@ -91,12 +85,30 @@
             });
         }
         else {
-            $('#errorData').html("You must fill in the blanks");
+            $('#errorText').html("You must fill in the blanks");
+            errorText.style.visibility = 'visible';
             setTimeout(function () {
-                $('#errorData').html("");
+                $('#errorText').html("");
+                errorText.style.visibility = 'hidden';
             }, 1000);
-        }
-        
+        } 
+    });
+    $('#InsertDate').click(function () {
+        for (var i = 0; i < 7; i++) {
+            swType.push(document.getElementById("dropdownid" + [i]).value);
+            $.ajax(
+                {
+                    type: "POST",
+                    url: "Schedule/InsertSchedule",
+                    data: {
+                        EmployeeId: 1,
+                        Date: date[i],
+                        Week: week,
+                        Year: year,
+                        SwType: swType[i]
+                    }
+                });
+        };
     });
 
 </script>
