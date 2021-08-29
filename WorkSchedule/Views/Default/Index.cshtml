@@ -6,16 +6,23 @@
     ViewData["Title"] = "Default Page";
 }
 <!DOCTYPE html>
-<link href="~/css/site.css" rel="stylesheet" />
 <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+<link href="~/css/site.css" rel="stylesheet" />
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <html>
 <body>
     <div class="container">
+
+        <br />
         <div class="form-row">
             <div class="col">
-                <label for="Name">Enter Your Name</label>
-                <input type="text" id="Name" class="form-control form-control-sm" placeholder="Name" />
+                <label>Select Your Name</label>
+                <select id="employeeSelect" class="custom-select custom-select-sm" aria-label=".form-select-lg example">
+                    @foreach (var employee in Model.Employees)
+                    {
+                        <option value=@employee.EmployeeId>@employee.EmployeeName</option>
+                    }
+                </select>
             </div>
             <div class="col">
                 <label for="Year">Enter Year</label>
@@ -41,79 +48,78 @@
             <br>
             <button type="submit" id="InsertDate" class="btn btn-secondary">Insert Date</button>
         </div>
-        
+
 
     </div>
 
-<script type="text/jscript">
-    var insertDateButton = document.querySelector('#insertDateButton');
-    var errorText = document.querySelector('#errorText');
-    var name, week, year;
-    var swType = [];
-    var date = [];
-    $('#Submit').click(function () {
-        var urlDate = "/Schedule/FirstDateOfWeek";
-        var urlEmployee = "/Employee/GetEmployees";
-        var items = '<thead class="thead-dark"><tr><th scope="col">Name</th>';
-        name = $('#Name').val();
-        week = $('#WeekOfYear').val();
-        year = $('#Year').val();
-        var lengthOfWeek;
-        var tr = '<tbody>';
-        if (name.length > 0 && week > 0 && year > 0 && week < 54) {
-            insertDateButton.style.visibility = 'visible';
-            $.get(urlDate, { year: year, weekOfYear: week }, function (data) {
-                $.each(data, function (index, value) {
-                    items += "<th scope='col'>" + value + "</th>"
-                    date.push(value);
+    <script type="text/jscript">
+        var insertDateButton = document.querySelector('#insertDateButton');
+        var errorText = document.querySelector('#errorText');
+        var selectedEmployeeId, week, year;
+        var swType = [];
+        var date = [];
+        $('#Submit').click(function () {
+            selectedEmployeeId = document.getElementById("employeeSelect").value
+            var urlDate = "/Schedule/FirstDateOfWeek";
+            var urlEmployee = "/Employee/GetEmployees";
+            var items = '<thead class="thead-dark"><tr><th scope="col">Name</th>';
+            week = $('#WeekOfYear').val();
+            year = $('#Year').val();
+            var lengthOfWeek;
+            var tr = '<tbody>';
+            if (selectedEmployeeId > 0 && week > 0 && year > 0 && week < 54) {
+                insertDateButton.style.visibility = 'visible';
+                $.get(urlDate, { year: year, weekOfYear: week }, function (data) {
+                    $.each(data, function (index, value) {
+                        items += "<th scope='col'>" + value + "</th>"
+                        date.push(value);
+                    });
+                    items += "</tr></thead>";
+                    $('#showData').html(items);
+                    lengthOfWeek = data.length;
                 });
-                items += "</tr></thead>";
-                $('#showData').html(items);
-                lengthOfWeek = data.length;
-            });
-            $.get(urlEmployee, null, function (data) {
-                for (var i = 0; i < data.length; i++) {
-                    if (data[i].employeeName == name) {
-                        tr += "<tr><td>" + data[i].employeeName + "</td>";
+                $.get(urlEmployee, null, function (data) {
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].employeeId == selectedEmployeeId) {
+                            tr += "<tr><td>" + data[i].employeeName + "</td>";
+                        }
                     }
-                    
-                }
-                for (var i = 0; i < lengthOfWeek; i++) {
-                    tr += "<td class='dropdown'><select id='dropdownid" + [i] +"' name = 'filter_for'><option value='ST'>ST</option><option value='NW'>NW</option><option value='AL'>AL</option><option value='HR'>HR</option><option value='UL'>UL</option><option value='SW'>SW</option><option value='ML'>ML</option><option value='W'>W</option><option value='PH'>PH</option></select ></td >"
-                }
-                $('#showData').append(tr);
-            });
-        }
-        else {
-            $('#errorText').html("You must fill in the blanks");
-            errorText.style.visibility = 'visible';
-            setTimeout(function () {
-                $('#errorText').html("");
-                errorText.style.visibility = 'hidden';
-            }, 1000);
-        } 
-    });
-    $('#InsertDate').click(function () {
-        for (var i = 0; i < 7; i++) {
-            swType.push(document.getElementById("dropdownid" + [i]).value);
-            $.ajax(
-                {
-                    type: "POST",
-                    url: "Schedule/InsertSchedule",
-                    data: {
-                        EmployeeId: 1,
-                        Date: date[i],
-                        Week: week,
-                        Year: year,
-                        SwType: swType[i]
+                    for (var i = 0; i < lengthOfWeek; i++) {
+                        tr += "<td class='dropdown'><select id='dropdownid" + [i] + "' name = 'filter_for'><option value='ST'>ST</option><option value='NW'>NW</option><option value='AL'>AL</option><option value='HR'>HR</option><option value='UL'>UL</option><option value='SW'>SW</option><option value='ML'>ML</option><option value='W'>W</option><option value='PH'>PH</option></select ></td >"
                     }
+                    $('#showData').append(tr);
                 });
-        };
-    });
+            }
+            else {
+                $('#errorText').html("You must fill in the blanks");
+                errorText.style.visibility = 'visible';
+                setTimeout(function () {
+                    $('#errorText').html("");
+                    errorText.style.visibility = 'hidden';
+                }, 1000);
+            }
+        });
+        $('#InsertDate').click(function () {
+            for (var i = 0; i < 7; i++) {
+                swType.push(document.getElementById("dropdownid" + [i]).value);
+                $.ajax(
+                    {
+                        type: "POST",
+                        url: "Schedule/InsertSchedule",
+                        data: {
+                            EmployeeId: selectedEmployeeId,
+                            Date: date[i],
+                            Week: week,
+                            Year: year,
+                            SwType: swType[i]
+                        }
+                    });
+            };
+        });
 
-</script>
+    </script>
 
-@*<table>
+    @*<table>
             <thead>
                 <tr>
                     <th>Name</th>
