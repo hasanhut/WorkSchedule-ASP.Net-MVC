@@ -64,10 +64,14 @@ namespace WorkSchedule.Controllers
         {
             using (_context)
             {
-                _context.Schedules.Add(schedule);
-                _context.SaveChanges();
+                var check = _context.Schedules.FirstOrDefault(x => x.EmployeeId == schedule.EmployeeId && x.Date == schedule.Date);
+                if (check == null)
+                {
+                    _context.Schedules.Add(schedule);
+                    _context.SaveChanges();
+                }
+                
             }
-
             return Json(schedule);
         }
 
