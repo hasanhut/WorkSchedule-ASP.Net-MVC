@@ -22,13 +22,20 @@ namespace WorkSchedule.Controllers
         {
             return View();
         }
+        [HttpGet]
+        public IActionResult GetSchedules()
+        {
+            var result = _context.Schedules.ToList();
+            return Ok(result);
+        }
         public ActionResult FirstDateOfWeek(int year, int weekOfYear)
         {
             if (year == 0 & weekOfYear == 0)
             {
                 return BadRequest("Error");
             }
-            DateTime jan1 = new DateTime(year, 1, 1);
+            DateTime jan1 = new DateTime(year,1,1);
+
             int daysOffset = Convert.ToInt32(System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek) - Convert.ToInt32(jan1.DayOfWeek);
             DateTime firstWeekDay = jan1.AddDays(daysOffset);
             System.Globalization.CultureInfo curCulture = System.Globalization.CultureInfo.CurrentCulture;
@@ -64,10 +71,24 @@ namespace WorkSchedule.Controllers
         {
             using (_context)
             {
-                var check = _context.Schedules.FirstOrDefault(x => x.EmployeeId == schedule.EmployeeId && x.Date == schedule.Date);
+                var check = _context.Schedules.First(x => x.Week == schedule.Week && x.EmployeeId == schedule.EmployeeId);
                 if (check == null)
                 {
                     _context.Schedules.Add(schedule);
+                    _context.SaveChanges();
+                }
+                else
+                {
+
+                    Schedule newSchedule = new Schedule();
+                    newSchedule.ScheduleId = schedule.ScheduleId;
+                    newSchedule.EmployeeId = schedule.EmployeeId;
+                    newSchedule.Date = schedule.Date;
+                    newSchedule.Year = schedule.Year;
+                    newSchedule.Week = schedule.Week;
+                    newSchedule.SwType = schedule.SwType;
+                    _context.Schedules.Add(newSchedule);
+                    _context.Schedules.Remove(check);
                     _context.SaveChanges();
                 }
                 

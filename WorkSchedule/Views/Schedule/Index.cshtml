@@ -36,32 +36,26 @@
         </div>
         <table id="showData" class="table">
         </table>
-        <div id="insertDateButton">
-            <br>
-            <button type="submit" id="InsertDate" class="btn btn-secondary">Insert Date</button>
-        </div>
-
+        <p id="rData"></p>
 
     </div>
 
 <script type="text/jscript">
-        var insertDateButton = document.querySelector('#insertDateButton');
         var errorText = document.querySelector('#errorText');
         var week, year;
         var swType = [];
         var date = [];
+        var results = [];
         $('#Submit').click(function () {
             var urlDate = "/Schedule/FirstDateOfWeek";
             var urlEmployee = "/Employee/GetEmployees";
-            var urlGetDates = "/Schedule/GetDates";
+            var urlGetDates = "/Schedule/GetSchedules";
             var items = '<thead class="thead-dark"><tr><th scope="col">Name</th>';
-            week = $('#WeekOfYear').val();
+            weekOfYear = $('#WeekOfYear').val();
             year = $('#Year').val();
-            var lengthOfWeek;
             var tr = '<tbody>';
-            if (week > 0 && year > 0 && week < 54) {
-                insertDateButton.style.visibility = 'visible';
-                $.get(urlDate, { year: year, weekOfYear: week }, function (data) {
+            if (weekOfYear > 0 && year > 0 && weekOfYear < 54) {
+                $.get(urlDate, { year: year, weekOfYear: weekOfYear }, function (data) {
                     $.each(data, function (index, value) {
                         items += "<th scope='col'>" + value + "</th>"
                         date.push(value);
@@ -71,12 +65,26 @@
                     lengthOfWeek = data.length;
                 });
                 
+                //$.get(urlGetDates, null, function (data) {
+                //    var result = data.filter(p => p.week == weekOfYear);
+                //    for (var i = 0; i < result.length; i++) {
+
+                //    }
+                //});
+                
                 $.get(urlEmployee, null, function (data) {
                     for (var i = 0; i < data.length; i++) {
                         tr += "<tr><td>" + data[i].employeeName + "</td>";
-                        for (var x = 0; x < lengthOfWeek; x++) {
-                            tr += "<td>SWTYPE</td >"
-                        }
+                        //for (var x = 0; x < lengthOfWeek; x++) {
+                        //    tr += "<td>SWTYPE</td >"
+                        //}
+                        
+                        $.get(urlGetDates, null, function (dateData) {
+                            var result = dateData.filter(p => p.employeeId == data[i].employeeId);
+                            console.log(result);
+                            
+                        });
+                        console.log(data[i].employeeName)
                     }
 
                     $('#showData').append(tr);

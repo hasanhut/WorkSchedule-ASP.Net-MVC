@@ -52,7 +52,7 @@
 
     </div>
 
-    <script type="text/jscript">
+<script type="text/jscript">
         var insertDateButton = document.querySelector('#insertDateButton');
         var errorText = document.querySelector('#errorText');
         var selectedEmployeeId, week, year;
@@ -71,7 +71,8 @@
                 insertDateButton.style.visibility = 'visible';
                 $.get(urlDate, { year: year, weekOfYear: week }, function (data) {
                     $.each(data, function (index, value) {
-                        items += "<th scope='col'>" + value + "</th>"
+                        newValue = value.replace("T00:00:00", "");
+                        items += "<th scope='col'>" + newValue + "</th>"
                         date.push(value);
                     });
                     items += "</tr></thead>";
