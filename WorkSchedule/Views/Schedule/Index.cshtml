@@ -1,8 +1,9 @@
 ﻿@using WorkSchedule.Controllers
+@using Newtonsoft.Json
 @model WorkSchedule.Models.ViewModel
 
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Schedule Page";
 }
 <!DOCTYPE html>
 <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
@@ -16,6 +17,12 @@
     <div class="container">
         <br />
         <div class="form-row">
+            <div class="col">
+                <label>Select Your Name</label>
+                <select id="employeeSelect" class="custom-select custom-select-sm" aria-label=".form-select-lg example">
+                    
+                </select>
+            </div>
             <div class="col">
                 <label for="Year">Enter Year</label>
                 <input type="number" id="Year" value="2021" class="form-control form-control-sm" placeholder="Year" />
@@ -42,13 +49,19 @@
 
 <script type="text/jscript">
         var errorText = document.querySelector('#errorText');
-        var week, year;
+        var week, year, selectedEmployeeId;
         var swType = [];
         var date = [];
         var results = [];
+        var urlEmployee = "/Employee/GetEmployees";
+        $.get(urlEmployee, null, function (data) {
+            for (var i = 0; i < data.length; i++) {
+                $("#employeeSelect").append("<option value=" + data[i].employeeId + ">" + data[i].employeeName + " " + data[i].employeeSurname +"</option>")
+            };
+        });
         $('#Submit').click(function () {
+            selectedEmployeeId = document.getElementById("employeeSelect").value;
             var urlDate = "/Schedule/FirstDateOfWeek";
-            var urlEmployee = "/Employee/GetEmployees";
             var urlGetDates = "/Schedule/GetSchedules";
             var items = '<thead class="thead-dark"><tr><th scope="col">Name</th>';
             weekOfYear = $('#WeekOfYear').val();
@@ -64,29 +77,22 @@
                     $('#showData').html(items);
                     lengthOfWeek = data.length;
                 });
-                
-                //$.get(urlGetDates, null, function (data) {
-                //    var result = data.filter(p => p.week == weekOfYear);
-                //    for (var i = 0; i < result.length; i++) {
 
-                //    }
-                //});
-                
                 $.get(urlEmployee, null, function (data) {
                     for (var i = 0; i < data.length; i++) {
-                        tr += "<tr><td>" + data[i].employeeName + "</td>";
-                        //for (var x = 0; x < lengthOfWeek; x++) {
-                        //    tr += "<td>SWTYPE</td >"
-                        //}
-                        
-                        $.get(urlGetDates, null, function (dateData) {
-                            var result = dateData.filter(p => p.employeeId == data[i].employeeId);
-                            console.log(result);
-                            
-                        });
-                        console.log(data[i].employeeName)
+                        if (data[i].employeeId == selectedEmployeeId) {
+                            tr += "<tr><td>" + data[i].employeeName + " " + data[i].employeeSurname + "</td>";
+                        }
                     }
+                });
 
+                $.get(urlGetDates, null, function (data) {
+                    var result = data.filter(p => p.week == weekOfYear && p.year == year && p.employeeId == selectedEmployeeId);
+                    //var sortedList = (from s in result orderby s.Date descending select s).ToList();
+                    //console.log(sortedList);
+                    for (var i = 0; i < result.length; i++) {
+                        tr += "<td>"+result[i].swType+"</td >"
+                    }
                     $('#showData').append(tr);
                 });
             }

@@ -20,7 +20,7 @@
                 <select id="employeeSelect" class="custom-select custom-select-sm" aria-label=".form-select-lg example">
                     @foreach (var employee in Model.Employees)
                     {
-                        <option value=@employee.EmployeeId>@employee.EmployeeName</option>
+                        <option value=@employee.EmployeeId>@employee.EmployeeName @employee.EmployeeSurname</option>
                     }
                 </select>
             </div>
@@ -56,10 +56,10 @@
         var insertDateButton = document.querySelector('#insertDateButton');
         var errorText = document.querySelector('#errorText');
         var selectedEmployeeId, week, year;
-        var swType = [];
-        var date = [];
+        var date;
         $('#Submit').click(function () {
-            selectedEmployeeId = document.getElementById("employeeSelect").value
+            date = [];
+            selectedEmployeeId = document.getElementById("employeeSelect").value;
             var urlDate = "/Schedule/FirstDateOfWeek";
             var urlEmployee = "/Employee/GetEmployees";
             var items = '<thead class="thead-dark"><tr><th scope="col">Name</th>';
@@ -82,7 +82,7 @@
                 $.get(urlEmployee, null, function (data) {
                     for (var i = 0; i < data.length; i++) {
                         if (data[i].employeeId == selectedEmployeeId) {
-                            tr += "<tr><td>" + data[i].employeeName + "</td>";
+                            tr += "<tr><td>" + data[i].employeeName + " " +data[i].employeeSurname + "</td>";
                         }
                     }
                     for (var i = 0; i < lengthOfWeek; i++) {
@@ -101,6 +101,7 @@
             }
         });
         $('#InsertDate').click(function () {
+            var swType = [];
             for (var i = 0; i < 7; i++) {
                 swType.push(document.getElementById("dropdownid" + [i]).value);
                 $.ajax(

@@ -71,27 +71,21 @@ namespace WorkSchedule.Controllers
         {
             using (_context)
             {
-                var check = _context.Schedules.First(x => x.Week == schedule.Week && x.EmployeeId == schedule.EmployeeId);
-                if (check == null)
-                {
-                    _context.Schedules.Add(schedule);
-                    _context.SaveChanges();
-                }
-                else
-                {
+                //var check = _context.Schedules.Where(x => x.Week == schedule.Week && x.EmployeeId == schedule.EmployeeId)
+                //    .ToList();
+                //if (check.Count != 0)
+                //{
+                //    //_context.Schedules.Add(schedule);
+                //    _context.Schedules.RemoveRange(check);
+                //    _context.SaveChanges();
+                //}
+                //else
+                //{
+                    
+                //}
+                _context.Schedules.Add(schedule);
+                _context.SaveChanges();
 
-                    Schedule newSchedule = new Schedule();
-                    newSchedule.ScheduleId = schedule.ScheduleId;
-                    newSchedule.EmployeeId = schedule.EmployeeId;
-                    newSchedule.Date = schedule.Date;
-                    newSchedule.Year = schedule.Year;
-                    newSchedule.Week = schedule.Week;
-                    newSchedule.SwType = schedule.SwType;
-                    _context.Schedules.Add(newSchedule);
-                    _context.Schedules.Remove(check);
-                    _context.SaveChanges();
-                }
-                
             }
             return Json(schedule);
         }
