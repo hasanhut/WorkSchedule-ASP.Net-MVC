@@ -1,9 +1,6 @@
-﻿@using WorkSchedule.Controllers
-@using Newtonsoft.Json
-@model WorkSchedule.Models.ViewModel
-
-@{
+﻿@{
     ViewData["Title"] = "Default Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <!DOCTYPE html>
 <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
@@ -12,16 +9,13 @@
 <html>
 <body>
     <div class="container">
-
+        <h2 style="text-align:center">Submit Page</h2>
         <br />
         <div class="form-row">
             <div class="col">
                 <label>Select Your Name</label>
                 <select id="employeeSelect" class="custom-select custom-select-sm" aria-label=".form-select-lg example">
-                    @foreach (var employee in Model.Employees)
-                    {
-                        <option value=@employee.EmployeeId>@employee.EmployeeName @employee.EmployeeSurname</option>
-                    }
+                    
                 </select>
             </div>
             <div class="col">
@@ -48,27 +42,65 @@
             <br>
             <button type="submit" id="InsertDate" class="btn btn-secondary">Insert Date</button>
         </div>
+        <div id="swTypeTable">
+            <table id="swTypeBox">
+                <thead>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ST</td>
+                        <td>NW</td>
+                        <td>AL</td>
+                        <td>HR</td>
+                        <td>UL</td>
+                        <td>SW</td>
+                        <td>ML</td>
+                        <td>W</td>
+                        <td>PH</td>
+                    </tr>
+                    <tr>
+                        <td>Short Term Working</td>
+                        <td>Normal Working</td>
+                        <td>Annual Leave</td>
+                        <td>Health Report</td>
+                        <td>Unpaid Leave</td>
+                        <td>Smart Working</td>
+                        <td>Marriage Leave</td>
+                        <td>Weekend</td>
+                        <td>Public Holiday</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
 
 
     </div>
 
 <script type="text/jscript">
         var insertDateButton = document.querySelector('#insertDateButton');
+        var swTypeTable = document.querySelector('#swTypeTable');
         var errorText = document.querySelector('#errorText');
         var selectedEmployeeId, week, year;
         var date;
+        var urlEmployee = "/Employee/GetEmployees";
+        $.get(urlEmployee, null, function (data) {
+            for (var i = 0; i < data.length; i++) {
+                $("#employeeSelect").append("<option value=" + data[i].employeeId + ">" + data[i].employeeName + " " + data[i].employeeSurname + "</option>")
+            };
+        });
         $('#Submit').click(function () {
             date = [];
             selectedEmployeeId = document.getElementById("employeeSelect").value;
             var urlDate = "/Schedule/FirstDateOfWeek";
-            var urlEmployee = "/Employee/GetEmployees";
             var items = '<thead class="thead-dark"><tr><th scope="col">Name</th>';
             week = $('#WeekOfYear').val();
             year = $('#Year').val();
             var lengthOfWeek;
-            var tr = '<tbody>';
+            var body = '<tbody>';
             if (selectedEmployeeId > 0 && week > 0 && year > 0 && week < 54) {
                 insertDateButton.style.visibility = 'visible';
+                swTypeTable.style.visibility = 'visible';
                 $.get(urlDate, { year: year, weekOfYear: week }, function (data) {
                     $.each(data, function (index, value) {
                         newValue = value.replace("T00:00:00", "");
@@ -82,13 +114,13 @@
                 $.get(urlEmployee, null, function (data) {
                     for (var i = 0; i < data.length; i++) {
                         if (data[i].employeeId == selectedEmployeeId) {
-                            tr += "<tr><td>" + data[i].employeeName + " " +data[i].employeeSurname + "</td>";
+                            body += "<tr><td scope='row'>" + data[i].employeeName + " " +data[i].employeeSurname + "</td>";
                         }
-                    }
+                    };
                     for (var i = 0; i < lengthOfWeek; i++) {
-                        tr += "<td class='dropdown'><select id='dropdownid" + [i] + "' name = 'filter_for'><option value='ST'>ST</option><option value='NW'>NW</option><option value='AL'>AL</option><option value='HR'>HR</option><option value='UL'>UL</option><option value='SW'>SW</option><option value='ML'>ML</option><option value='W'>W</option><option value='PH'>PH</option></select ></td >"
-                    }
-                    $('#showData').append(tr);
+                        body += "<td class='dropdown'><select id='dropdownid" + [i] + "' name = 'filter_for'><option value='ST'>ST</option><option value='NW'>NW</option><option value='AL'>AL</option><option value='HR'>HR</option><option value='UL'>UL</option><option value='SW'>SW</option><option value='ML'>ML</option><option value='W'>W</option><option value='PH'>PH</option></select ></td >"
+                    };
+                    $('#showData').append(body);
                 });
             }
             else {

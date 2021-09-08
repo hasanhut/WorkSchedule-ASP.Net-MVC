@@ -7,6 +7,7 @@ using Itenso.TimePeriod;
 using System.Configuration;
 using System.Data.SqlClient;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using WorkSchedule.Models;
 
 namespace WorkSchedule.Controllers
@@ -71,23 +72,21 @@ namespace WorkSchedule.Controllers
         {
             using (_context)
             {
-                //var check = _context.Schedules.Where(x => x.Week == schedule.Week && x.EmployeeId == schedule.EmployeeId)
-                //    .ToList();
-                //if (check.Count != 0)
-                //{
-                //    //_context.Schedules.Add(schedule);
-                //    _context.Schedules.RemoveRange(check);
-                //    _context.SaveChanges();
-                //}
-                //else
-                //{
-                    
-                //}
-                _context.Schedules.Add(schedule);
-                _context.SaveChanges();
-
+                var check = _context.Schedules.Where(
+                    x => x.Date == schedule.Date && x.EmployeeId == schedule.EmployeeId && x.Week == schedule.Week && x.Year == schedule.Year).FirstOrDefault();
+                if (check == null)
+                {
+                    _context.Schedules.Add(schedule);
+                    _context.SaveChanges();
+                }
+                else if (check.SwType != schedule.SwType)
+                {
+                    check.SwType = schedule.SwType;
+                    _context.Entry(check).State = EntityState.Modified;
+                    _context.SaveChanges();
+                }
             }
-            return Json(schedule);
+            return Ok(schedule);
         }
 
     }

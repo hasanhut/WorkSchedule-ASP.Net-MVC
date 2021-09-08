@@ -7068,8 +7068,9 @@ button.bg-dark:focus {
 }
 
 .align-items-stretch {
-  -ms-flex-align: stretch !important;
-  align-items: stretch !important;
+    -webkit-box-align: stretch !important;
+    -ms-flex-align: stretch !important;
+    align-items: stretch !important;
 }
 
 .align-content-start {
@@ -10034,5 +10035,6 @@ a.text-dark:hover, a.text-dark:focus {
     color: inherit;
     border-color: #dee2e6;
   }
+
 }
 /*# sourceMappingURL=bootstrap.css.map */

@@ -1,9 +1,6 @@
-﻿@using WorkSchedule.Controllers
-@using Newtonsoft.Json
-@model WorkSchedule.Models.ViewModel
-
-@{
-    ViewData["Title"] = "Schedule Page";
+﻿@{
+    ViewData["Title"] = "View Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <!DOCTYPE html>
 <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
@@ -11,32 +8,32 @@
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <html>
 <head>
-
 </head>
 <body>
     <div class="container">
+        <h2 style="text-align:center">View Page</h2>
         <br />
-        <div class="form-row">
-            <div class="col">
-                <label>Select Your Name</label>
-                <select id="employeeSelect" class="custom-select custom-select-sm" aria-label=".form-select-lg example">
-                    
-                </select>
-            </div>
-            <div class="col">
-                <label for="Year">Enter Year</label>
-                <input type="number" id="Year" value="2021" class="form-control form-control-sm" placeholder="Year" />
-            </div>
-            <div class="col">
-                <label for="WeekOfYear">Enter Week Of Year</label>
-                <input type="number" id="WeekOfYear" min="1" max="53" class="form-control form-control-sm" placeholder="Week" />
-                <small id="weekHelp" class="form-text text-muted">Week must be entered between the numbers 1 and 53.</small>
-            </div>
+        <div class="col">
+            <label>Select Your Name</label>
+            <select id="employeeSelect" class="custom-select custom-select-sm" aria-label=".form-select-lg example">
+            </select>
         </div>
+        <div class="col">
+            <label for="Year">Enter Year</label>
+            <input type="number" id="Year" value="2021" class="form-control form-control-sm" placeholder="Year" />
+        </div>
+        <div class="col">
+            <label for="WeekOfYear">Enter Week Of Year</label>
+            <input type="number" id="WeekOfYear" min="1" max="53" class="form-control form-control-sm" placeholder="Week" />
+            <small id="weekHelp" class="form-text text-muted">Week must be entered between the numbers 1 and 53.</small>
+        </div>
+
         <br />
         <div id="submitButton">
-            <button type="submit" id="Submit" class="btn btn-secondary">Submit</button>
+            <button type="submit" id="Submit" class="btn btn-secondary">List Your Schedule</button>
+
         </div>
+
         <br />
         <div class="alert alert-danger" role="alert" id="errorText">
             <br>
@@ -51,7 +48,7 @@
         var errorText = document.querySelector('#errorText');
         var week, year, selectedEmployeeId;
         var swType = [];
-        var date = [];
+        var date;
         var results = [];
         var urlEmployee = "/Employee/GetEmployees";
         $.get(urlEmployee, null, function (data) {
@@ -60,6 +57,7 @@
             };
         });
         $('#Submit').click(function () {
+            date = [];
             selectedEmployeeId = document.getElementById("employeeSelect").value;
             var urlDate = "/Schedule/FirstDateOfWeek";
             var urlGetDates = "/Schedule/GetSchedules";
@@ -67,10 +65,11 @@
             weekOfYear = $('#WeekOfYear').val();
             year = $('#Year').val();
             var tr = '<tbody>';
-            if (weekOfYear > 0 && year > 0 && weekOfYear < 54) {
+            if (selectedEmployeeId>0 && weekOfYear > 0 && year > 0 && weekOfYear < 54) {
                 $.get(urlDate, { year: year, weekOfYear: weekOfYear }, function (data) {
                     $.each(data, function (index, value) {
-                        items += "<th scope='col'>" + value + "</th>"
+                        newValue = value.replace("T00:00:00", "");
+                        items += "<th scope='col'>" + newValue + "</th>"
                         date.push(value);
                     });
                     items += "</tr></thead>";
@@ -84,12 +83,14 @@
                             tr += "<tr><td>" + data[i].employeeName + " " + data[i].employeeSurname + "</td>";
                         }
                     }
+                    
                 });
 
                 $.get(urlGetDates, null, function (data) {
                     var result = data.filter(p => p.week == weekOfYear && p.year == year && p.employeeId == selectedEmployeeId);
-                    //var sortedList = (from s in result orderby s.Date descending select s).ToList();
-                    //console.log(sortedList);
+                    result.sort(function (a, b) {
+                        return new Date(a.date) - new Date(b.date)
+                    });
                     for (var i = 0; i < result.length; i++) {
                         tr += "<td>"+result[i].swType+"</td >"
                     }
