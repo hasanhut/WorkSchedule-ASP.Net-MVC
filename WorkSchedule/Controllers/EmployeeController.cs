@@ -20,7 +20,7 @@ namespace WorkSchedule.Controllers
             return View();
         }
         [HttpGet]
-        public IActionResult GetEmployees()
+        public ActionResult GetEmployees()
         {
             var result = _context.Employees.ToList();
             return Ok(result);

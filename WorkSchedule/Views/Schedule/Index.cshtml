@@ -13,11 +13,11 @@
     <div class="container">
         <h2 style="text-align:center">View Page</h2>
         <br />
-        <div class="col">
+        @*<div class="col">
             <label>Select Your Name</label>
             <select id="employeeSelect" class="custom-select custom-select-sm" aria-label=".form-select-lg example">
             </select>
-        </div>
+        </div>*@
         <div class="col">
             <label for="Year">Enter Year</label>
             <input type="number" id="Year" value="2021" class="form-control form-control-sm" placeholder="Year" />
@@ -45,27 +45,25 @@
     </div>
 
 <script type="text/jscript">
+    $(document).ready(function () {
         var errorText = document.querySelector('#errorText');
-        var week, year, selectedEmployeeId;
-        var swType = [];
-        var date;
-        var results = [];
         var urlEmployee = "/Employee/GetEmployees";
+        var urlGetDates = "/Schedule/GetSchedules";
+        var urlDate = "/Schedule/FirstDateOfWeek";
+        var year;
+        var date;
+        var users;
+        var arrays;
         $.get(urlEmployee, null, function (data) {
-            for (var i = 0; i < data.length; i++) {
-                $("#employeeSelect").append("<option value=" + data[i].employeeId + ">" + data[i].employeeName + " " + data[i].employeeSurname +"</option>")
-            };
+            users = data.length;
         });
-        $('#Submit').click(function () {
+    $('#Submit').click(function () {
             date = [];
-            selectedEmployeeId = document.getElementById("employeeSelect").value;
-            var urlDate = "/Schedule/FirstDateOfWeek";
-            var urlGetDates = "/Schedule/GetSchedules";
             var items = '<thead class="thead-dark"><tr><th scope="col">Name</th>';
             weekOfYear = $('#WeekOfYear').val();
             year = $('#Year').val();
             var tr = '<tbody>';
-            if (selectedEmployeeId>0 && weekOfYear > 0 && year > 0 && weekOfYear < 54) {
+            if (weekOfYear > 0 && year > 0 && weekOfYear < 54) {
                 $.get(urlDate, { year: year, weekOfYear: weekOfYear }, function (data) {
                     $.each(data, function (index, value) {
                         newValue = value.replace("T00:00:00", "");
@@ -74,28 +72,35 @@
                     });
                     items += "</tr></thead>";
                     $('#showData').html(items);
-                    lengthOfWeek = data.length;
-                });
-
-                $.get(urlEmployee, null, function (data) {
-                    for (var i = 0; i < data.length; i++) {
-                        if (data[i].employeeId == selectedEmployeeId) {
-                            tr += "<tr><td>" + data[i].employeeName + " " + data[i].employeeSurname + "</td>";
+                    $.get(urlGetDates, null, function (value) {
+                        var result = value.filter(p => p.week == weekOfYear && p.year == year);
+                        arrays = [];
+                        while (result.length > 0) {
+                            arrays.push(result.splice(0, 7));
+                        };
+                        if (arrays.length == users) {
+                            for (var i = 0; i < users; i++) {
+                                arrays[i].sort(function (a, b) {
+                                    return new Date(a.date) - new Date(b.date)
+                                });
+                            };
+                            $.get(urlEmployee, null, function (data) {
+                                for (var i = 0; i < data.length; i++) {
+                                    tr += "<tr><td>" + data[i].employeeName + " " + data[i].employeeSurname + "</td>";
+                                    for (var x = 0; x < 7; x++) {
+                                        tr += "<td>" + arrays[i][x].swType + "</td>";
+                                    };
+                                };
+                                $('#showData').append(tr);
+                            });
                         }
-                    }
-                    
-                });
+                        else {
 
-                $.get(urlGetDates, null, function (data) {
-                    var result = data.filter(p => p.week == weekOfYear && p.year == year && p.employeeId == selectedEmployeeId);
-                    result.sort(function (a, b) {
-                        return new Date(a.date) - new Date(b.date)
+                        }
                     });
-                    for (var i = 0; i < result.length; i++) {
-                        tr += "<td>"+result[i].swType+"</td >"
-                    }
-                    $('#showData').append(tr);
                 });
+                
+                
             }
             else {
                 $('#errorText').html("You must fill in the blanks");
@@ -106,7 +111,7 @@
                 }, 1000);
             }
         });
-
-    </script>
+    });
+</script>
 </body>
 </html>
