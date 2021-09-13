@@ -99,9 +99,9 @@
         var insertDateButton = document.querySelector('#insertDateButton');
         var swTypeTable = document.querySelector('#swTypeTable');
         var errorText = document.querySelector('#errorText');
-        var selectedEmployeeId, week, year;
-        var date;
+        var selectedEmployeeId, week, year,date;
         var urlEmployee = "/Employee/GetEmployees";
+        var urlDate = "/Schedule/FirstDateOfWeek";
         $.get(urlEmployee, null, function (data) {
             for (var i = 0; i < data.length; i++) {
                 $("#employeeSelect").append("<option value=" + data[i].employeeId + ">" + data[i].employeeName + " " + data[i].employeeSurname + "</option>")
@@ -110,36 +110,36 @@
         $('#Submit').click(function () {
             date = [];
             selectedEmployeeId = document.getElementById("employeeSelect").value;
-            var urlDate = "/Schedule/FirstDateOfWeek";
-            var items = '<thead class="thead-dark"><tr><th scope="col">Name</th>';
+            var table = '<thead class="thead-dark"><tr><th scope="col">Name</th>';
             week = $('#WeekOfYear').val();
             year = $('#Year').val();
             var lengthOfWeek;
-            var body = '<tbody>';
+            var tableBody = '<tbody>';
             if (selectedEmployeeId > 0 && week > 0 && year > 0 && week < 54) {
                 insertDateButton.style.visibility = 'visible';
                 swTypeTable.style.visibility = 'visible';
                 $.get(urlDate, { year: year, weekOfYear: week }, function (data) {
                     $.each(data, function (index, value) {
                         newValue = value.replace("T00:00:00", "");
-                        items += "<th scope='col'>" + newValue + "</th>"
+                        table += "<th scope='col'>" + newValue + "</th>"
                         date.push(value);
                     });
-                    items += "</tr></thead>";
-                    $('#showData').html(items);
+                    table += "</tr></thead>";
+                    $('#showData').html(table);
                     lengthOfWeek = data.length;
+                    $.get(urlEmployee, null, function (data) {
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].employeeId == selectedEmployeeId) {
+                                tableBody += "<tr><td scope='row'>" + data[i].employeeName + " " + data[i].employeeSurname + "</td>";
+                            }
+                        };
+                        for (var i = 0; i < lengthOfWeek; i++) {
+                            tableBody += "<td class='dropdown'><select id='dropdownid" + [i] + "' name = 'filter_for'><option value='ST'>ST</option><option value='NW'>NW</option><option value='AL'>AL</option><option value='HR'>HR</option><option value='UL'>UL</option><option value='SW'>SW</option><option value='ML'>ML</option><option value='W'>W</option><option value='PH'>PH</option></select ></td >"
+                        };
+                        $('#showData').append(tableBody);
+                    });
                 });
-                $.get(urlEmployee, null, function (data) {
-                    for (var i = 0; i < data.length; i++) {
-                        if (data[i].employeeId == selectedEmployeeId) {
-                            body += "<tr><td scope='row'>" + data[i].employeeName + " " +data[i].employeeSurname + "</td>";
-                        }
-                    };
-                    for (var i = 0; i < lengthOfWeek; i++) {
-                        body += "<td class='dropdown'><select id='dropdownid" + [i] + "' name = 'filter_for'><option value='ST'>ST</option><option value='NW'>NW</option><option value='AL'>AL</option><option value='HR'>HR</option><option value='UL'>UL</option><option value='SW'>SW</option><option value='ML'>ML</option><option value='W'>W</option><option value='PH'>PH</option></select ></td >"
-                    };
-                    $('#showData').append(body);
-                });
+                
             }
             else {
                 $('#errorText').html("You must fill in the blanks");

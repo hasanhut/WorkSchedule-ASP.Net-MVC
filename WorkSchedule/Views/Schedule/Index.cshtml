@@ -13,11 +13,6 @@
     <div class="container">
         <h2 style="text-align:center">View Page</h2>
         <br />
-        @*<div class="col">
-            <label>Select Your Name</label>
-            <select id="employeeSelect" class="custom-select custom-select-sm" aria-label=".form-select-lg example">
-            </select>
-        </div>*@
         <div class="col">
             <label for="Year">Enter Year</label>
             <input type="number" id="Year" value="2021" class="form-control form-control-sm" placeholder="Year" />
@@ -31,7 +26,6 @@
         <br />
         <div id="submitButton">
             <button type="submit" id="Submit" class="btn btn-secondary">List Your Schedule</button>
-
         </div>
 
         <br />
@@ -40,7 +34,37 @@
         </div>
         <table id="showData" class="table">
         </table>
-        <p id="rData"></p>
+        <div id="swTypeTable">
+            <table id="swTypeBox">
+                <thead>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>ST</td>
+                    <td>NW</td>
+                    <td>AL</td>
+                    <td>HR</td>
+                    <td>UL</td>
+                    <td>SW</td>
+                    <td>ML</td>
+                    <td>W</td>
+                    <td>PH</td>
+                </tr>
+                <tr>
+                    <td>Short Term Working</td>
+                    <td>Normal Working</td>
+                    <td>Annual Leave</td>
+                    <td>Health Report</td>
+                    <td>Unpaid Leave</td>
+                    <td>Smart Working</td>
+                    <td>Marriage Leave</td>
+                    <td>Weekend</td>
+                    <td>Public Holiday</td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
 
     </div>
 
@@ -50,57 +74,55 @@
         var urlEmployee = "/Employee/GetEmployees";
         var urlGetDates = "/Schedule/GetSchedules";
         var urlDate = "/Schedule/FirstDateOfWeek";
-        var year;
-        var date;
-        var users;
-        var arrays;
+        var year,date,users,arrays;
         $.get(urlEmployee, null, function (data) {
             users = data.length;
         });
     $('#Submit').click(function () {
             date = [];
-            var items = '<thead class="thead-dark"><tr><th scope="col">Name</th>';
+            var table = '<thead class="thead-dark"><tr><th scope="col">Name</th>';
             weekOfYear = $('#WeekOfYear').val();
             year = $('#Year').val();
-            var tr = '<tbody>';
+            var tableBody = '<tbody>';
             if (weekOfYear > 0 && year > 0 && weekOfYear < 54) {
+                swTypeTable.style.visibility = 'visible';
                 $.get(urlDate, { year: year, weekOfYear: weekOfYear }, function (data) {
                     $.each(data, function (index, value) {
                         newValue = value.replace("T00:00:00", "");
-                        items += "<th scope='col'>" + newValue + "</th>"
+                        table += "<th scope='col'>" + newValue + "</th>"
                         date.push(value);
                     });
-                    items += "</tr></thead>";
-                    $('#showData').html(items);
+                    table += "</tr></thead>";
+                    $('#showData').html(table);
                     $.get(urlGetDates, null, function (value) {
                         var result = value.filter(p => p.week == weekOfYear && p.year == year);
                         arrays = [];
                         while (result.length > 0) {
                             arrays.push(result.splice(0, 7));
                         };
-                        if (arrays.length == users) {
-                            for (var i = 0; i < users; i++) {
+                        for (var i = 0; i < users; i++) {
+                            if (typeof arrays[i] != "undefined") {
                                 arrays[i].sort(function (a, b) {
                                     return new Date(a.date) - new Date(b.date)
                                 });
-                            };
-                            $.get(urlEmployee, null, function (data) {
-                                for (var i = 0; i < data.length; i++) {
-                                    tr += "<tr><td>" + data[i].employeeName + " " + data[i].employeeSurname + "</td>";
-                                    for (var x = 0; x < 7; x++) {
-                                        tr += "<td>" + arrays[i][x].swType + "</td>";
-                                    };
+                            }
+                        };
+                        $.get(urlEmployee, null, function (data) {
+                            for (var i = 0; i < data.length; i++) {
+                                tableBody += "<tr><td>" + data[i].employeeName + " " + data[i].employeeSurname + "</td>";
+                                for (var x = 0; x < 7; x++) {
+                                    if (typeof arrays[i] != "undefined") {
+                                        tableBody += "<td>" + arrays[i][x].swType + "</td>";
+                                    }
+                                    else {
+                                        tableBody += "<td>---</td>"
+                                    }
                                 };
-                                $('#showData').append(tr);
-                            });
-                        }
-                        else {
-
-                        }
+                            };
+                            $('#showData').append(tableBody);
+                        });
                     });
                 });
-                
-                
             }
             else {
                 $('#errorText').html("You must fill in the blanks");

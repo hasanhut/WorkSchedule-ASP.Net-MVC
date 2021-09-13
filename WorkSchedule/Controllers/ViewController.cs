@@ -7,20 +7,17 @@ using WorkSchedule.Models;
 
 namespace WorkSchedule.Controllers
 {
-    public class DefaultController : Controller
+    public class ViewController : Controller
     {
         private readonly Context _context;
 
-        public DefaultController(Context context)
+        public ViewController(Context context)
         {
             _context = context;
         }
         public IActionResult Index()
         {
-            ViewModel myModel = new ViewModel();
-            myModel.Employees = _context.Employees.ToList();
-            myModel.Schedules = _context.Schedules.ToList();
-            return View(myModel);
+            return View();
         }
     }
 }
