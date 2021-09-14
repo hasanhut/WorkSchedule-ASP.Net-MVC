@@ -53,7 +53,7 @@ namespace WorkSchedule
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=View}/{action=Index}/{id?}");
+                    pattern: "{controller=Schedule}/{action=Index}/{id?}");
             });
         }
     }

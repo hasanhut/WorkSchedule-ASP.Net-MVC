@@ -2,11 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Itenso.TimePeriod;
-using System.Configuration;
-using System.Data.SqlClient;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using WorkSchedule.Models;
 
@@ -48,17 +43,10 @@ namespace WorkSchedule.Controllers
 
             var firstDate = firstWeekDay.AddDays(weekOfYear * 7);
             var allWeekDays = new List<DateTime>();
-            var allWeekendDays = new List<DateTime>();
             allWeekDays.Add(firstDate);
             var currentDate = firstDate;
             for (int d = 1; d < 7; d++)
             {
-
-                //if (d == 5 || d == 6)
-                //{
-                //    currentDate = currentDate.AddDays(1);
-                //    allWeekendDays.Add(currentDate);
-                //}
                 currentDate = currentDate.AddDays(1);
                 allWeekDays.Add(currentDate);
 
@@ -73,7 +61,8 @@ namespace WorkSchedule.Controllers
             using (_context)
             {
                 var check = _context.Schedules.Where(
-                    x => x.Date == schedule.Date && x.EmployeeId == schedule.EmployeeId && x.Week == schedule.Week && x.Year == schedule.Year).FirstOrDefault();
+                    x => x.Date == schedule.Date && x.EmployeeId == schedule.EmployeeId && x.Week == schedule.Week && x.Year == schedule.Year)
+                    .FirstOrDefault();
                 if (check == null)
                 {
                     _context.Schedules.Add(schedule);

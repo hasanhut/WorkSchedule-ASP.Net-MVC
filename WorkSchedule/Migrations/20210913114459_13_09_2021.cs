@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WorkSchedule.Migrations
 {
-    public partial class initialmigration : Migration
+    public partial class _13_09_2021 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -11,10 +11,10 @@ namespace WorkSchedule.Migrations
                 name: "Employees",
                 columns: table => new
                 {
-                    EmployeeId = table.Column<int>(type: "int", nullable: false)
+                    EmployeeId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    EmployeeName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    EmployeeSurname = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    EmployeeName = table.Column<string>(maxLength: 50, nullable: false),
+                    EmployeeSurname = table.Column<string>(maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -25,13 +25,13 @@ namespace WorkSchedule.Migrations
                 name: "Schedules",
                 columns: table => new
                 {
-                    ScheduleId = table.Column<int>(type: "int", nullable: false)
+                    ScheduleId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    EmployeeId = table.Column<int>(type: "int", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Week = table.Column<int>(type: "int", nullable: false),
-                    Year = table.Column<int>(type: "int", nullable: false),
-                    SwType = table.Column<string>(type: "nvarchar(2)", nullable: true)
+                    EmployeeId = table.Column<int>(nullable: false),
+                    Date = table.Column<DateTime>(nullable: false),
+                    Week = table.Column<int>(nullable: false),
+                    Year = table.Column<int>(nullable: false),
+                    SwType = table.Column<string>(maxLength: 2, nullable: false)
                 },
                 constraints: table =>
                 {

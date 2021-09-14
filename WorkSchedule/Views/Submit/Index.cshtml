@@ -66,28 +66,11 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>ST</td>
-                        <td>NW</td>
-                        <td>AL</td>
-                        <td>HR</td>
-                        <td>UL</td>
-                        <td>SW</td>
-                        <td>ML</td>
-                        <td>W</td>
-                        <td>PH</td>
+                        <td>ST</td><td>NW</td><td>AL</td><td>HR</td><td>UL</td><td>SW</td><td>ML</td><td>W</td><td>PH</td>
                     </tr>
                     <tr>
-                        <td>Short Term Working</td>
-                        <td>Normal Working</td>
-                        <td>Annual Leave</td>
-                        <td>Health Report</td>
-                        <td>Unpaid Leave</td>
-                        <td>Smart Working</td>
-                        <td>Marriage Leave</td>
-                        <td>Weekend</td>
-                        <td>Public Holiday</td>
+                        <td>Short Term Working</td><td>Normal Working</td><td>Annual Leave</td><td>Health Report</td><td>Unpaid Leave</td><td>Smart Working</td><td>Marriage Leave</td><td>Weekend</td><td>Public Holiday</td>
                     </tr>
-
                 </tbody>
             </table>
         </div>
@@ -115,7 +98,7 @@
             year = $('#Year').val();
             var lengthOfWeek;
             var tableBody = '<tbody>';
-            if (selectedEmployeeId > 0 && week > 0 && year > 0 && week < 54) {
+            if (selectedEmployeeId > 0 && week > 0 && year > 0 && week < 53) {
                 insertDateButton.style.visibility = 'visible';
                 swTypeTable.style.visibility = 'visible';
                 $.get(urlDate, { year: year, weekOfYear: week }, function (data) {
