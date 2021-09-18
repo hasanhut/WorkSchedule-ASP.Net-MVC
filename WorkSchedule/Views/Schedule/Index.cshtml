@@ -37,26 +37,10 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td>ST</td>
-                    <td>NW</td>
-                    <td>AL</td>
-                    <td>HR</td>
-                    <td>UL</td>
-                    <td>SW</td>
-                    <td>ML</td>
-                    <td>W</td>
-                    <td>PH</td>
+                    <td>ST</td><td>NW</td><td>AL</td><td>HR</td><td>UL</td><td>SW</td><td>ML</td><td>W</td><td>PH</td>
                 </tr>
                 <tr>
-                    <td>Short Term Working</td>
-                    <td>Normal Working</td>
-                    <td>Annual Leave</td>
-                    <td>Health Report</td>
-                    <td>Unpaid Leave</td>
-                    <td>Smart Working</td>
-                    <td>Marriage Leave</td>
-                    <td>Weekend</td>
-                    <td>Public Holiday</td>
+                    <td>Short Term Working</td><td>Normal Working</td><td>Annual Leave</td><td>Health Report</td><td>Unpaid Leave</td><td>Smart Working</td><td>Marriage Leave</td><td>Weekend</td><td>Public Holiday</td>
                 </tr>
 
                 </tbody>
@@ -67,6 +51,7 @@
 
 <script type="text/jscript">
     $(document).ready(function () {
+        // VARIABLES
         var errorText = document.querySelector('#errorText');
         var urlEmployee = "/Employee/GetEmployees";
         var urlGetDates = "/Schedule/GetSchedules";
@@ -83,14 +68,18 @@
             var tableBody = '<tbody>';
             if (weekOfYear > 0 && year > 0 && weekOfYear < 53) {
                 swTypeTable.style.visibility = 'visible';
+                //Taking the weekly dates from the controllers
                 $.get(urlDate, { year: year, weekOfYear: weekOfYear }, function (data) {
                     $.each(data, function (index, value) {
+                        //It cuts off the time portion of the dates.
                         newValue = value.replace("T00:00:00", "");
                         table += "<th scope='col'>" + newValue + "</th>"
                         date.push(value);
                     });
                     table += "</tr></thead>";
+                    // Adding the dates to the table
                     $('#showData').html(table);
+                    //Taking SwType datas.
                     $.get(urlGetDates, null, function (value) {
                         var result = value.filter(p => p.week == weekOfYear && p.year == year);
                         arrays = [];
@@ -121,6 +110,7 @@
                     });
                 });
             }
+            // ERROR PART
             else {
                 $('#errorText').html("You must fill in the blanks");
                 errorText.style.visibility = 'visible';

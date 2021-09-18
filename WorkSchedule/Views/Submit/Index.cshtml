@@ -15,7 +15,6 @@
             <div class="col">
                 <label>Select Your Name</label>
                 <select id="employeeSelect" class="custom-select custom-select-sm" aria-label=".form-select-lg example">
-                    
                 </select>
             </div>
             <div class="col">
@@ -33,9 +32,11 @@
             <button type="submit" id="Submit" class="btn btn-secondary">Submit</button>
         </div>
         <br />
+        @*If there is an empty field, an error occurs.*@
         <div class="alert alert-danger" role="alert" id="errorText">
             <br>
         </div>
+        @*This section contains the table.*@
         <table id="showData" class="table">
         </table>
         <div id="insertDateButton">
@@ -44,7 +45,7 @@
         </div>
         <div class="modal fade" id="myModal" role="dialog">
             <div class="modal-dialog">
-    
+
                 <!-- Modal content-->
                 <div class="modal-content">
                     <div class="modal-header">
@@ -57,7 +58,7 @@
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
-      
+
             </div>
         </div>
         <div id="swTypeTable">
@@ -79,51 +80,73 @@
     </div>
 
 <script type="text/jscript">
+        /*These are the variables*/
         var insertDateButton = document.querySelector('#insertDateButton');
         var swTypeTable = document.querySelector('#swTypeTable');
         var errorText = document.querySelector('#errorText');
         var selectedEmployeeId, week, year,date;
         var urlEmployee = "/Employee/GetEmployees";
         var urlDate = "/Schedule/FirstDateOfWeek";
+        var urlGetDates = "/Schedule/GetSchedules";
+        //In this section, employee names are added to the dropdown menu.
         $.get(urlEmployee, null, function (data) {
             for (var i = 0; i < data.length; i++) {
                 $("#employeeSelect").append("<option value=" + data[i].employeeId + ">" + data[i].employeeName + " " + data[i].employeeSurname + "</option>")
             };
         });
+        
         $('#Submit').click(function () {
             date = [];
             selectedEmployeeId = document.getElementById("employeeSelect").value;
             var table = '<thead class="thead-dark"><tr><th scope="col">Name</th>';
             week = $('#WeekOfYear').val();
             year = $('#Year').val();
-            var lengthOfWeek;
             var tableBody = '<tbody>';
             if (selectedEmployeeId > 0 && week > 0 && year > 0 && week < 53) {
                 insertDateButton.style.visibility = 'visible';
                 swTypeTable.style.visibility = 'visible';
+                //Taking the weekly dates from the controllers
                 $.get(urlDate, { year: year, weekOfYear: week }, function (data) {
                     $.each(data, function (index, value) {
+                        //It cuts off the time portion of the dates.
                         newValue = value.replace("T00:00:00", "");
                         table += "<th scope='col'>" + newValue + "</th>"
                         date.push(value);
                     });
                     table += "</tr></thead>";
+                    // Adding the dates to the table
                     $('#showData').html(table);
-                    lengthOfWeek = data.length;
+                    //Taking employees informations from controllers.
                     $.get(urlEmployee, null, function (data) {
                         for (var i = 0; i < data.length; i++) {
+                            //If the selected name is selected, it adds that name to the table.
                             if (data[i].employeeId == selectedEmployeeId) {
                                 tableBody += "<tr><td scope='row'>" + data[i].employeeName + " " + data[i].employeeSurname + "</td>";
                             }
                         };
-                        for (var i = 0; i < lengthOfWeek; i++) {
-                            tableBody += "<td class='dropdown'><select id='dropdownid" + [i] + "' name = 'filter_for'><option value='ST'>ST</option><option value='NW'>NW</option><option value='AL'>AL</option><option value='HR'>HR</option><option value='UL'>UL</option><option value='SW'>SW</option><option value='ML'>ML</option><option value='W'>W</option><option value='PH'>PH</option></select ></td >"
-                        };
-                        $('#showData').append(tableBody);
+                        //Taking SwType datas.
+                        $.get(urlGetDates, null, function (value) {
+                            var result = value.filter(p => p.week == week && p.year == year && p.employeeId == selectedEmployeeId);
+                            if (result.length > 0) {
+                                //The data is kept in a mixed way on the database. lists the dates in order.
+                                result.sort(function (a, b) {
+                                    return new Date(a.date) - new Date(b.date);
+                                });
+                                for (var i = 0; i < 7; i++) {
+                                    tableBody += "<td class='dropdown'><select id='dropdownid" + [i] + "' name = 'filter_for'><option selected disabled hidden>" + result[i].swType + "</option><option value='ST'>ST</option><option value='NW'>NW</option><option value='AL'>AL</option><option value='HR'>HR</option><option value='UL'>UL</option><option value='SW'>SW</option><option value='ML'>ML</option><option value='W'>W</option><option value='PH'>PH</option></select ></td >"
+                                };
+                            } else {
+                                for (var i = 0; i < 7; i++) {
+                                    tableBody += "<td class='dropdown'><select id='dropdownid" + [i] + "' name = 'filter_for'><option selected disabled hidden>SW Types</option><option value='ST'>ST</option><option value='NW'>NW</option><option value='AL'>AL</option><option value='HR'>HR</option><option value='UL'>UL</option><option value='SW'>SW</option><option value='ML'>ML</option><option value='W'>W</option><option value='PH'>PH</option></select ></td >"
+                                };
+                            }
+                            $('#showData').append(tableBody);
+                        });
                     });
                 });
                 
             }
+            // ERROR PART
             else {
                 $('#errorText').html("You must fill in the blanks");
                 errorText.style.visibility = 'visible';
@@ -133,8 +156,10 @@
                 }, 1000);
             }
         });
+        //The part with the dates inserted
         $('#InsertDate').click(function () {
             var swType = [];
+            //Since we insert it for 7 days, it runs this part 7 times.
             for (var i = 0; i < 7; i++) {
                 swType.push(document.getElementById("dropdownid" + [i]).value);
                 $.ajax(
@@ -151,7 +176,6 @@
                     });
             };
         });
-
-    </script>
+</script>
 </body>
 </html>
