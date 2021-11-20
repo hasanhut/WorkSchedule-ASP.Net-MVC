@@ -23,31 +23,27 @@ The aim of this project is to enable the employees to use the application easily
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
-
 ```bash
-pip install foobar
+# Create database
+$ Check the mssql query in project file.
+
+# Clone to repository
+$ git clone https://github.com/hasanhut/WorkSchedule-ASP.Net-MVC.git
+
+# Go to the folder you cloned
+$ cd WorkSchedule-ASP.Net-MVC
+
+# Install dependencies
+$ dotnet restore
 ```
 
-## Getting Started
+## Screenshots
 
-```python
-import foobar
+![Report Page](https://github.com/hasanhut/WorkSchedule-ASP.Net-MVC/blob/master/WorkSchedule/ScreenShots/Screenshot_1.png)
+![Insertion Page](https://github.com/hasanhut/WorkSchedule-ASP.Net-MVC/blob/master/WorkSchedule/ScreenShots/Screenshot_2.png)
 
-# returns 'words'
-foobar.pluralize('word')
-
-# returns 'geese'
-foobar.pluralize('goose')
-
-# returns 'phenomenon'
-foobar.singularize('phenomena')
-```
-
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
 
 ## License
+
 [MIT](https://choosealicense.com/licenses/mit/)
+
